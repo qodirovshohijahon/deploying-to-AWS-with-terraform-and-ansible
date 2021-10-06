@@ -9,7 +9,6 @@ resource "aws_vpc" "vpc_master" {
   }
 }
 
-
 #Create VPC in us-west-2
 resource "aws_vpc" "vpc_master_oregon" {
   provider             = aws.region-worker
@@ -20,6 +19,8 @@ resource "aws_vpc" "vpc_master_oregon" {
     Name = "worker-vpc-jenkins"
   }
 }
+
+
 
 
 #Create IGW in us-east-1
@@ -35,13 +36,11 @@ resource "aws_internet_gateway" "igw-oregon" {
   vpc_id   = aws_vpc.vpc_master.id
 }
 
-
 #Get all available AZ's in VPC for master region
 data "aws_availability_zones" "azs" {
   provider = aws.region-master
   state    = "available"
 }
-
 
 #Create subnet # 1 in us-east-1
 resource "aws_subnet" "subnet_1" {
@@ -68,7 +67,6 @@ resource "aws_subnet" "subnet_1_oregon" {
   cidr_block = "192.168.1.0/24"
 }
 
-
 #Initiate Peering connection request from us-east-1
 resource "aws_vpc_peering_connection" "useast1-uswest2" {
   provider    = aws.region-master
@@ -77,14 +75,12 @@ resource "aws_vpc_peering_connection" "useast1-uswest2" {
   peer_region = var.region-worker
 }
 
-
 #Accepting VPC peering request in us-west-2 from us-east-1
 resource "aws_vpc_peering_connection_accepter" "accept_peering" {
   provider                      = aws.region-worker
   aws_vpc_peering_connection_id = aws_vpc_peering_connection.useast1-uswest2.id
   auto_accept                   = true
 }
-
 
 #Create route table in us-east-1
 
@@ -115,7 +111,6 @@ resource "aws_main_route_table_association" "set-master-default-rt-assoc" {
   route_table_id = aws_route_table.internet_route.id
 }
 
-
 #Create route table in us-west-2
 resource "aws_route_table" "internet_route_oregon" {
   provider = aws.region-worker
@@ -135,7 +130,6 @@ resource "aws_route_table" "internet_route_oregon" {
     Name = "Worker-Region-RT"
   }
 }
-
 
 #Overwrite default route table of VPC(Worker) with our route table entries
 resource "aws_main_route_table_association" "set-worker-default-rt-assoc" {
